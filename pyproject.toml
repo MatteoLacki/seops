@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools >= 64", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name="seops"
+version="0.0.1"
+description="Software Engineering Operations/"
+readme="README.md"
+authors=[
+    {name="Mateusz Krzysztof Łącki",email="matteo.lacki@gmail.com"},
+]
+dependencies = []
+
+# [project.scripts]
+# write_config = "pandas_ops.tools.write_config:main"
+
+[project.urls]
+homepage="https://github.com/midiaIDorg/seops.git"
+repository="https://github.com/midiaIDorg/seops.git"
+
+[tool.uv]
+reinstall-package = ["seops"]
+
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
