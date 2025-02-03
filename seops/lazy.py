@@ -58,6 +58,11 @@ class LazyPartial:
 
 
 class CommonArguments:
+    """
+    Keep a collection of lazily evaluated (but not necessarily cached) objects.
+    Provide only callables as input.
+    """
+
     def __init__(self, **providers):
         self._providers = {}
         for name, provider in providers.items():
