@@ -6,9 +6,12 @@ class LazyPartial:
     def __init__(self, **providers):
         """
         Store providers for lazy evaluation.
-        Each provider should be a callable returning the value.
+        Callable providers will be called.
+        If you want those callable providers to be cached, wrap them in functools.cache yourself.
         """
-        self._providers = providers
+        self._providers = {}
+        for name, prov in providers.items():
+            self.register(name, prov)
 
     def register(self, name, provider):
         """Add or override an argument provider."""
@@ -52,6 +55,37 @@ class LazyPartial:
             return func(*args, **all_kwargs)
 
         return wrapper
+
+
+class CommonArguments:
+    def __init__(self, **providers):
+        self._providers = {}
+        for name, provider in providers.items():
+            self.register(name, provider)
+
+    def register(self, name, provider):
+        """Add or override an argument provider."""
+        assert callable(provider)
+        self._providers[name] = provider
+
+    def get_kwargs(self, foo, renaming={}, **foo_kwargs):
+        kwargs = {}
+        for param in inspect.signature(foo).parameters:
+            if param in foo_kwargs:
+                kwargs[param] = foo_kwargs[param]
+                continue
+
+            provider_name = renaming.get(param, param)
+            if provider_name not in self._providers:
+                continue
+
+            provider = self._providers[provider_name]
+            kwargs[param] = provider()
+
+        return kwargs
+
+    def get_args(self, foo, renaming={}, *foo_args, **foo_kwargs):
+        return list(self.get_kwargs(foo, renaming, *foo_args, **foo_kwargs).values())
 
 
 # lazy_partial = LazyPartial(x=lambda: 1, y=10)
